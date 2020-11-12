@@ -1,1 +1,129 @@
 
+DROP DATABASE IF EXISTS academia;
+CREATE DATABASE academia;
+USE academia;
+
+DROP TABLE IF EXISTS ACADEMIA;
+DROP TABLE IF EXISTS HORÁRIO_FUNCIONAMENTO;
+DROP TABLE IF EXISTS ENDEREÇO;
+DROP TABLE IF EXISTS FUNCIONÁRIO;
+DROP TABLE IF EXISTS CONTRATO;
+DROP TABLE IF EXISTS SALÁRIO;
+DROP TABLE IF EXISTS CLIENTE;
+DROP TABLE IF EXISTS TREINO;
+DROP TABLE IF EXISTS PAGAMENTO;
+DROP TABLE IF EXISTS SUPLEMENTO;
+DROP TABLE IF EXISTS CLIENTE_EFETUA_TREINO;
+DROP TABLE IF EXISTS CLIENTE_COMPRA_SUPLEMENTO;
+
+
+
+CREATE TABLE ACADEMIA(
+    codigo INTEGER,
+    nome VARCHAR(100),
+    dono VARCHAR(100),
+    n_estabelecimento INTEGER,
+    FOREIGN KEY (n_estabelecimento) REFERENCES ENDEREÇO (n_estabelecimento),
+    PRIMARY KEY (codigo)
+);
+
+CREATE TABLE HORÁRIO_FUNCIONAMENTO(
+    cod_academia INTEGER,
+    dia_semana VARCHAR(20),
+    horário_abertura INTEGER,
+    horário_fechamento INTEGER,
+    codigo INTEGER,
+    FOREIGN KEY (codigo) REFERENCES ACADEMIA (codigo),
+    PRIMARY KEY (cod_academia)
+);
+
+CREATE TABLE ENDEREÇO(
+    n_estabelecimento INTEGER,
+    cidade VARCHAR(30),
+    bairro VARCHAR(30),
+    rua VARCHAR(50),
+    PRIMARY KEY (n_estabelecimento)
+);
+
+CREATE TABLE FUNCIONÁRIO(
+    cpf INTEGER,
+    nome VARCHAR(100),
+    especialidade VARCHAR(30),
+    n_estabelecimento INTEGER,
+    codigo INTEGER,
+    cpf_funcionario INTEGER,
+    cpf_func INTEGER,
+    FOREIGN KEY (cpf_funcionario) REFERENCES CONTRATO (cpf_funcionario),
+    FOREIGN KEY (cpf_func) REFERENCES SALÁRIO (cpf_func),
+    FOREIGN KEY (n_estabelecimento) REFERENCES ENDEREÇO (n_estabelecimento),
+    FOREIGN KEY (codigo) REFERENCES ACADEMIA (codigo),
+    PRIMARY KEY (cpf)
+);
+
+CREATE TABLE CONTRATO(
+    cpf_funcionário INTEGER,
+    data_início DATE,
+    data_validade DATE,
+    PRIMARY KEY (cpf_funcionario)
+);
+
+CREATE TABLE SALÁRIO(
+    cpf_func INTEGER,
+    valor INTEGER,
+    data_pagamento DATE,
+    PRIMARY KEY (cpf_func)
+);
+
+CREATE TABLE CLIENTE(
+    cpf_cliente INTEGER,
+    nome VARCHAR(100),
+    login_entrada INTEGER,
+    n_estabelecimento INTEGER,
+    cpf INTEGER,
+    cod_treino INTEGER,
+    cpf_pagador INTEGER,
+    FOREIGN KEY (n_estabelecimento) REFERENCES ENDEREÇO (n_estabelecimento),
+    FOREIGN KEY (cpf) REFERENCES FUNCIONÁRIO (cpf),
+    FOREIGN KEY (cod_treino) REFERENCES TREINO (cod_treino),
+    FOREIGN KEY (cpf_pagador) REFERENCES PAGAMENTO (cpf_pagador),
+    PRIMARY KEY (cpf_cliente)
+);
+
+CREATE TABLE TREINO(
+    cod_treino INTEGER,
+    tipo_treino VARCHAR(50),
+    qtd_hrs_semanais INTEGER,
+    fun_responsável VARCHAR(100),
+    tipo_treino VARCHAR(50),
+    PRIMARY KEY (cod_treino)
+);
+
+CREATE TABLE PAGAMENTO(
+    cpf_pagador INTEGER,
+    data_pagamento DATE,
+    valor_total INTEGER,
+    PRIMARY KEY (cpf_pagador)
+);
+
+CREATE TABLE SUPLEMENTO(
+    cod_suplemento INTEGER,
+    nome VARCHAR(50),
+    preço INTEGER,
+    PRIMARY KEY (cod_suplemento)
+);
+
+CREATE TABLE CLIENTE_EFETUA_TREINO(
+    cpf INTEGER,
+    cod_treino INTEGER,
+    FOREIGN KEY (cpf) REFERENCES CLIENTE (cpf),
+    FOREIGN KEY (cod_treino) REFERENCES TREINO (cod_treino),
+    PRIMARY KEY (cpf, cod_treino)
+);
+
+CREATE TABLE CLIENTE_COMPRA_SUPLEMENTO(
+    cpf_cliente INTEGER,
+    cod_suplemento INTEGER,
+    FOREIGN KEY (cpf_cliente) REFERENCES CLIENTE (cpf_cliente),
+    FOREIGN KEY (cod_suplemento) REFERENCES SUPLEMENTO (cod_suplemento),
+    PRIMARY KEY (cpf_cliente, cod_suplemento)
+);
