@@ -1,0 +1,128 @@
+USE academia;
+
+-- 1. encontra clientes que possuem o treino numero 4
+
+SELECT	C.nome
+FROM	CLIENTE C
+WHERE	C.cpf_cliente IN (
+					  SELECT	T.cod_treino
+					  FROM		TREINO C
+                      WHERE		T.cod_treino = '4'
+					 );
+
+
+
+
+-- 2. encontra os clientes que não compraram o suplemento Integral Médica
+
+SELECT	C.nome
+FROM	CLIENTE C
+WHERE	C.cpf_cliente NOT IN (
+					  SELECT	S.nome
+					  FROM		SUPLEMENTO S
+                      WHERE		S.nome = 'Integral Médica'
+					 );
+
+-- 3. encontra o nome dos funcionários que atendem o cliente Martín Reis
+
+
+SELECT F.nome
+FROM FUNCIONÁRIO F
+WHERE EXISTS ( SELECT *
+               FROM CLIENTES C
+               WHERE nome.C = 'Martín Reis'
+             );
+
+
+-- 4. encontra os funcionários  que recebem mais que  2000R$
+
+SELECT F.nome
+FROM FUNCIONÁRIO F, SALÁRIO S
+WHERE F.cpf = S.cpf_func AND
+      S.valor > ANY  (
+                        SELECT F.nome
+                        FROM FUNCIONÁRIO F2, SALÁRIO S2,
+                         WHERE F.cpf = S.cpf_func AND
+                         S.valor>2000
+                     );
+
+
+--5  encontra todos os suplementos cuja o preço seja maior ou igual que o suplemento Dymatize Nutrition
+
+
+SELECT S.nome
+FROM SUPLEMENTO S
+WHERE S.preço >= ALL  (
+                    SELECT S2.preço
+                    FROM SUPLEMENTO S2
+                    S2.nome =  'Dymatize Nutrition'
+                        );
+
+
+
+-- 6. encontra os treinos que tem mais horas que o treino de Esteira
+
+SELECT	T.tipo_treino,
+FROM	TREINO T
+WHERE	T.qtd_hrs_semanais > ANY(
+					  SELECT	T.qtd_hrs_semanais
+					  FROM		TREINO T
+                      WHERE		T.qtd_hrs_semanais > 7
+					 );
+
+
+--7  Verifique se há algum funcionario atendendo o cliente Alexander Dutra
+
+SELECT 	F.cpf
+FROM 	funcionarios F
+WHERE	F.cpf IN(
+					SELECT	C.cpf_cliente
+                    FROM	CLIENTE C
+                    WHERE	C.cpf_cliente = F.cpf
+                          AND C.cpf_cliente = '979.218.760-05'
+               );
+
+
+--8. nome das pessoas que compraram o suplemento Max Titanium
+  SELECT C.nome
+  FROM	cliente C
+  WHERE EXISTS  (
+                    SELECT	C.nome
+                    FROM	CLIENTE C, CLIENTE_COMPRA_SUPLEMENTO CCS;
+                  	WHERE	C.cpf_cliente = CCS.cpf_cliente
+                    AND   CCS.cod_suplemento = '1'
+
+               				);
+
+
+
+--9  seleciona o funcionario com maior e menor salário
+
+SELECT	F.nome, S.valor
+FROM	FUNCIONÁRIO F, SALÁRIO S
+WHERE	F.cpf = S.cpf_func
+AND S.valor = (
+					SELECT MAX(S.valor)
+					FROM SALÁRIO S
+				  )
+UNION
+
+SELECT	F2.nome, S2.valor
+FROM	FUNCIONÁRIO F2, SALÁRIO S2
+WHERE	F.cpf = S.cpf_func
+AND S2.valor = (
+					SELECT MIN(S2.valor)
+					FROM SALÁRIO S2
+				  );
+
+
+
+--10 seleciona quantas academias cuja o dono é luiz da Silva
+
+SELECT COUNT(*) A.dono
+FROM ACADEMIA A
+WHERE A.dono IN (
+                  SELECT A2.dono
+                  FROM ACADEMIA A2
+                  WHERE A2.dono = 'luiz da Silva'
+);
